@@ -1,0 +1,20 @@
+.node {
+  stroke: #00000;
+  stroke-width: 5px;
+}
+
+.link {
+  fill: none;
+  stroke: #000;
+  stroke-width: 4px;
+}
+
+text {
+  font: 12px sans-serif;
+  pointer-events: none;
+}
+
+text.id {
+  text-anchor: middle;
+  font-weight: bold;
+}

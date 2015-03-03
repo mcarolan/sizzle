@@ -1,0 +1,45 @@
+{
+	"services": [
+		{	
+			"name": "eap",
+			"references": [
+				{
+					"type": "http",
+					"service": "henry"
+				},
+				{
+					"type": "http",
+					"service": "liza"
+				}
+			]
+		},
+		{
+			"name": "liza",
+			"references": [
+				{
+					"type": "http",
+					"service": "bucket"
+				},
+				{
+					"type": "http",
+					"service": "henry"
+				}
+			]
+		},
+		{
+			"name": "henry",
+			"references": [
+				{
+					"type": "http",
+					"service": "ws"
+				}
+			]
+		},
+		{
+			"name": "ws"
+		},
+		{
+			"name": "bucket"
+		}
+	]
+}
