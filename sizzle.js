@@ -7,38 +7,51 @@
       var nodes = [];
       var edges = [];
 
-      for(var i = 0; i < 30; i++) {
-        var node = {
-          label : "node " + i
-        };
-        nodes.push(node);
-      };
-
-      for(var i = 0; i < nodes.length; i++) {
-        for(var j = 0; j < i; j++) {
-          if(Math.random() > .95)
-            edges.push({
-              source : i,
-              target : j,
-              weight : Math.random()
-            });
-        }
-      };
-
-      var force = d3.layout.force().size([w, h]).nodes(nodes).links(edges).gravity(1).linkDistance(100).charge(-5000).linkStrength(function(x) {
+      var force = d3.layout.force().size([w, h]).nodes(nodes).links(edges).gravity(1).linkDistance(120).charge(-7000).linkStrength(function(x) {
         return x.weight * 10
       });
 
-      force.start();
+      var edge = vis.selectAll("line.edge")
+      var node = vis.selectAll("g.node")  
 
-      var edge = vis.selectAll("line.edge").data(edges).enter().append("svg:line").attr("class", "edge");
+      function restart() {
+        edge = edge.data(edges).enter().append("svg:line").attr("class", "edge");
 
-      var node = vis.selectAll("g.node").data(force.nodes()).enter().append("svg:g");
-      node.append("svg:ellipse").attr("rx", 45).attr("ry", 20).attr("class", "serviceNode");
-      node.append("svg:text").text(function(d) {
-        return d.label;
-      }).attr("class", "serviceName");
-      node.call(force.drag);
+        node = node.data(force.nodes()).enter().append("svg:g");
+        node.append("svg:ellipse").attr("rx", 45).attr("ry", 20).attr("class", "serviceNode");
+        node.append("svg:text").text(function(d) {
+          return d.label;
+        }).attr("class", "serviceName");
+        node.call(force.drag);
+
+        force.start();
+      }
+
+      d3.json("system.json", function (error, system) {
+        var nodeIndex = {};
+        system.services.forEach(function (service, i) {
+          var node = {
+            label: service.name
+          };
+          nodes.push(node);
+          nodeIndex[service.name] = i;
+        });
+        system.services.forEach(function (service, i) {
+          if (service.references) {
+            service.references.forEach(function (reference) {
+              if (nodeIndex[reference.service]) {
+                var e = {
+                  source: i,
+                  target: nodeIndex[reference.service],
+                  weight: Math.random()
+                };
+                edges.push(e);
+              }
+            });
+          }
+        });
+        restart();
+      });
 
       var updateEdge = function() {
         this.attr("x1", function(d) {
