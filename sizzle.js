@@ -1,92 +1,64 @@
-var width = $(window).width(),
-    height = $(window).height();
+      var w = $(window).width(), h = $(window).height();
 
-var color = d3.scale.category20();
+      var labelDistance = 0;
 
-var force = d3.layout.force()
-    .size([width, height])
-    .gravity(1)
-    .linkDistance(100)
-    .charge(-3000)
-    .linkStrength(function(x) {
+      var vis = d3.select("body").append("svg:svg").attr("width", w).attr("height", h);
+
+      var nodes = [];
+      var edges = [];
+
+      for(var i = 0; i < 30; i++) {
+        var node = {
+          label : "node " + i
+        };
+        nodes.push(node);
+      };
+
+      for(var i = 0; i < nodes.length; i++) {
+        for(var j = 0; j < i; j++) {
+          if(Math.random() > .95)
+            edges.push({
+              source : i,
+              target : j,
+              weight : Math.random()
+            });
+        }
+      };
+
+      var force = d3.layout.force().size([w, h]).nodes(nodes).links(edges).gravity(1).linkDistance(100).charge(-5000).linkStrength(function(x) {
         return x.weight * 10
       });
 
-var svg = d3.select("body").append("svg")
-    .attr("width", width)
-    .attr("height", height);
+      force.start();
 
-var nodeGroup = svg.append('svg:g').selectAll('g');
+      var edge = vis.selectAll("line.edge").data(edges).enter().append("svg:line").attr("class", "edge");
 
-d3.json("system.json", function(error, system) {
-  var nodes = system.services.slice(),
-      links = [];
+      var node = vis.selectAll("g.node").data(force.nodes()).enter().append("svg:g");
+      node.append("svg:ellipse").attr("rx", 45).attr("ry", 20).attr("class", "serviceNode");
+      node.append("svg:text").text(function(d) {
+        return d.label;
+      }).attr("class", "serviceName");
+      node.call(force.drag);
 
-  var serviceLookup = {};
-  for (i in nodes) {
-    serviceLookup[nodes[i].name] = i;
-  }
-
-  for (i in nodes) {
-    var service = nodes[i];
-
-    for (j in service.references) {
-      var reference = service.references[j];
-      if (serviceLookup[reference.service]) {
-        var link = {source: parseInt(i, 10), target: parseInt(serviceLookup[reference.service], 10), weight: Math.random()};
-        links.push(link);
+      var updateEdge = function() {
+        this.attr("x1", function(d) {
+          return d.source.x;
+        }).attr("y1", function(d) {
+          return d.source.y;
+        }).attr("x2", function(d) {
+          return d.target.x;
+        }).attr("y2", function(d) {
+          return d.target.y;
+        });
       }
-      else {
-        console.log("did not create edge for unknown service " + reference.service);
+
+      var updateNode = function() {
+        this.attr("transform", function(d) {
+          return "translate(" + d.x + "," + d.y + ")";
+        });
       }
-    }
-  }
 
-  force
-      .nodes(nodes)
-      .links(links)
-      .start();
-
-  var link = svg.selectAll(".link")
-      .data(links)
-    .enter().append("path")
-      .attr("class", "link");
-
-  nodeGroup = nodeGroup.data(nodes, function(d) { return d.index; });
-  var g = nodeGroup.enter().append('svg:g'); 
-
-  g.append("ellipse")
-    .attr("class", "node")
-    .attr("rx", 30)
-    .attr("ry", 20)
-    .style("fill", function(d) { return color(d.group); })
-    .call(force.drag);
-
-  g.append("svg:text")
-      .attr('x', 0)
-      .attr('y', 4)
-      .attr('class', 'id')
-      .text(function(d) { return d.name; });
-
-  nodeGroup.exit().remove()
-
-  force.on("tick", function() {
-    link.attr('d', function(d) {
-    var deltaX = d.target.x - d.source.x,
-        deltaY = d.target.y - d.source.y,
-        dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
-        normX = deltaX / dist,
-        normY = deltaY / dist,
-        sourcePadding = 20,
-        targetPadding = 20,
-        sourceX = d.source.x + (sourcePadding * normX),
-        sourceY = d.source.y + (sourcePadding * normY),
-        targetX = d.target.x - (targetPadding * normX),
-        targetY = d.target.y - (targetPadding * normY);
-      return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
-    });
-    nodeGroup.attr("transform", function(d) {
-      return "translate(" + d.x + "," + d.y + ")";
-    });
-  });
-});
+      force.on("tick", function() {
+        node.call(updateNode);
+        edge.call(updateEdge);
+      });

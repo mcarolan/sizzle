@@ -1,20 +1,19 @@
-.node {
-  stroke: #00000;
-  stroke-width: 5px;
-}
 
-.link {
+.edge {
   fill: none;
-  stroke: #000;
+  stroke: #999999;
   stroke-width: 4px;
 }
 
-text {
-  font: 12px sans-serif;
-  pointer-events: none;
+.serviceName {
+	fill: #000000;
+	font-family: "Arial";
+	font-size: 12px;
+	text-anchor: middle;
 }
 
-text.id {
-  text-anchor: middle;
-  font-weight: bold;
+.serviceNode {
+	fill: #FFFFFF;
+	stroke: #DDDDDD;
+	stroke-width: 3;
 }
