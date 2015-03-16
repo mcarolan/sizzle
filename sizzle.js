@@ -20,7 +20,7 @@
         });
 
         node = node.data(force.nodes()).enter().append("svg:g");
-        node.append("svg:ellipse").attr("rx", 45).attr("ry", 20).attr("class", "serviceNode");
+        node.append("svg:ellipse").attr("rx", 45).attr("ry", 20).attr("class", "serviceNode shadowed");
         node.append("svg:text").text(function(d) {
           return d.label;
         }).attr("class", "serviceName");
