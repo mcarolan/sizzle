@@ -15,7 +15,9 @@
       var node = vis.selectAll("g.node")  
 
       function restart() {
-        edge = edge.data(edges).enter().append("svg:line").attr("class", "edge");
+        edge = edge.data(edges).enter().append("svg:line").attr("class", function (d) {
+          return "edge edge-" + d.type;
+        });
 
         node = node.data(force.nodes()).enter().append("svg:g");
         node.append("svg:ellipse").attr("rx", 45).attr("ry", 20).attr("class", "serviceNode");
@@ -43,7 +45,8 @@
                 var e = {
                   source: i,
                   target: nodeIndex[reference.service],
-                  weight: Math.random()
+                  weight: Math.random(),
+                  type: reference.type
                 };
                 edges.push(e);
               }

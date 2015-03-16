@@ -1,8 +1,15 @@
 
 .edge {
   fill: none;
-  stroke: #999999;
   stroke-width: 4px;
+}
+
+.edge-http {
+	stroke: #8F4650;
+}
+
+.edge-amqp {
+	stroke: #4F803F;
 }
 
 .serviceName {
@@ -15,6 +22,6 @@
 
 .serviceNode {
 	fill: #FFFFFF;
-	stroke: #DDDDDD;
+	stroke: #254852;
 	stroke-width: 3;
 }

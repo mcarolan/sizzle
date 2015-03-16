@@ -4,7 +4,7 @@
 			"name": "eap",
 			"references": [
 				{
-					"type": "http",
+					"type": "amqp",
 					"service": "henry"
 				},
 				{
@@ -30,7 +30,7 @@
 			"name": "henry",
 			"references": [
 				{
-					"type": "http",
+					"type": "amqp",
 					"service": "ws"
 				}
 			]
